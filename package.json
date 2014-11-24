@@ -1,0 +1,17 @@
+{
+  "name": "wxserver-api",
+  "version": "0.0.1",
+  "author": "Metocean Solutions Ltd",
+  "description": "API for wxServer, including wxTiles",
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/metocean/wxserver-api/raw/master/LICENSE"
+    }
+  ],
+  "readmeFilename": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/metocean/wxserver-api.git"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "wxserver-api",
+  "version": "0.0.1",
+  "homepage": "https://github.com/metocean/wxserver-api",
+  "authors": [
+    "MetOcean Solutions Limited"
+  ],
+  "description": "API for wxServer, including wxTiles",
+  "main": "dist/wxtiles.js",
+  "moduleType": [
+    "amd"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
