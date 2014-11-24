@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>WXTilesMinimap</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page">
+            
+              
+              <a class="source" href="wxtiles.html">
+                wxtiles.coffee
+              </a>
+            
+              
+              <a class="source" href="wxtiles.leaflet.colorbar.html">
+                wxtiles.leaflet.colorbar.coffee
+              </a>
+            
+              
+              <a class="source" href="wxtiles.leaflet.minimap.html">
+                wxtiles.leaflet.minimap.coffee
+              </a>
+            
+              
+              <a class="source" href="wxtiles.leaflet.tilelayer.html">
+                wxtiles.leaflet.tilelayer.coffee
+              </a>
+            
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              <h1 id="wxtilesminimap">WXTilesMinimap</h1>
+<p>Layers control with synced minimaps for WXTiles.
+Based largely on minimap by Jan Pieter Waagmeester <a href="&#x6d;&#x61;&#x69;&#x6c;&#x74;&#x6f;&#x3a;&#106;&#105;&#101;&#x74;&#x65;&#x72;&#64;&#106;&#x69;&#101;&#116;&#x65;&#114;&#x2e;&#110;&#108;">&#106;&#105;&#101;&#x74;&#x65;&#x72;&#64;&#106;&#x69;&#101;&#116;&#x65;&#114;&#x2e;&#110;&#108;</a></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function">
+<span class="hljs-title">_cloneLayer</span> = <span class="hljs-params">(layer)</span> -&gt;</span>
+	options = layer.options
+	<span class="hljs-keyword">if</span> layer <span class="hljs-keyword">instanceof</span> L.WXTileLayer
+		result = L.wxTileLayer layer._config, options
+		result.setField layer._field
+		result.setKey layer._key
+		<span class="hljs-keyword">return</span> result
+	<span class="hljs-keyword">return</span> L.tileLayer(layer._url, options) <span class="hljs-keyword">if</span> layer <span class="hljs-keyword">instanceof</span> L.TileLayer
+	<span class="hljs-keyword">return</span> L.imageOverlay(layer._url, layer._bounds, options) <span class="hljs-keyword">if</span> layer <span class="hljs-keyword">instanceof</span> L.ImageOverlay
+	<span class="hljs-keyword">return</span> L.polygon(layer.getLatLngs(), options) <span class="hljs-keyword">if</span> layer <span class="hljs-keyword">instanceof</span> L.Polygon <span class="hljs-keyword">or</span> layer <span class="hljs-keyword">instanceof</span> L.Rectangle
+	<span class="hljs-keyword">return</span> L.marker(layer.getLatLng(), options) <span class="hljs-keyword">if</span> layer <span class="hljs-keyword">instanceof</span> L.Marker
+	<span class="hljs-keyword">return</span> L.circleMarker(layer.getLatLng(), options) <span class="hljs-keyword">if</span> layer <span class="hljs-keyword">instanceof</span> L.circleMarker
+	<span class="hljs-keyword">return</span> L.polyline(layer.getLatLngs(), options) <span class="hljs-keyword">if</span> layer <span class="hljs-keyword">instanceof</span> L.Polyline
+	<span class="hljs-keyword">return</span> L.polyline(layer.getLatLngs(), options) <span class="hljs-keyword">if</span> layer <span class="hljs-keyword">instanceof</span> L.MultiPolyline
+	<span class="hljs-keyword">return</span> L.MultiPolygon(layer.getLatLngs(), options) <span class="hljs-keyword">if</span> layer <span class="hljs-keyword">instanceof</span> L.MultiPolygon
+	<span class="hljs-keyword">return</span> L.circle(layer.getLatLng(), layer.getRadius(), options) <span class="hljs-keyword">if</span> layer <span class="hljs-keyword">instanceof</span> L.Circle
+	<span class="hljs-keyword">return</span> L.geoJson(layer.toGeoJSON(), options) <span class="hljs-keyword">if</span> layer <span class="hljs-keyword">instanceof</span> L.GeoJSON</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>no interaction on minimaps, add FeatureGroup as LayerGroup</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-keyword">if</span> layer <span class="hljs-keyword">instanceof</span> L.LayerGroup <span class="hljs-keyword">or</span> layer <span class="hljs-keyword">instanceof</span> L.FeatureGroup
+		layergroup = L.layerGroup()
+		layer.eachLayer (inner) -&gt;
+			layergroup.addLayer _cloneLayer inner
+		layergroup
+
+L.Control.Layers.WXTilesMinimap = L.Control.extend
+	<span class="hljs-attribute">options</span>:
+		<span class="hljs-attribute">collapsed</span>: <span class="hljs-literal">yes</span>
+		<span class="hljs-attribute">autoZIndex</span>: <span class="hljs-literal">yes</span>
+		<span class="hljs-attribute">position</span>: <span class="hljs-string">'topright'</span>
+		<span class="hljs-attribute">topPadding</span>: <span class="hljs-number">10</span>
+		<span class="hljs-attribute">bottomPadding</span>: <span class="hljs-number">40</span>
+		<span class="hljs-attribute">backgroundLayer</span>: L.tileLayer <span class="hljs-string">'http://a{s}.acetate.geoiq.com/tiles/acetate-base/{z}/{x}/{y}.png'</span>,
+			<span class="hljs-attribute">attribution</span>: <span class="hljs-string">'&amp;copy;2012 Esri &amp; Stamen, Data from OSM and Natural Earth'</span>
+			<span class="hljs-attribute">subdomains</span>: <span class="hljs-string">'0123'</span>
+			<span class="hljs-attribute">minZoom</span>: <span class="hljs-number">2</span>
+			<span class="hljs-attribute">maxZoom</span>: <span class="hljs-number">18</span>
+
+	<span class="hljs-attribute">initialize</span>: <span class="hljs-function"><span class="hljs-params">(layers, options)</span> -&gt;</span>
+		L.setOptions @, options
+		<span class="hljs-property">@_layers</span> = {}
+		<span class="hljs-property">@_lastZIndex</span> = <span class="hljs-number">0</span>
+		<span class="hljs-property">@_handlingClick</span> = <span class="hljs-literal">no</span>
+		<span class="hljs-keyword">for</span> i <span class="hljs-keyword">of</span> layers
+			<span class="hljs-property">@_addLayer</span> layers[i], i
+
+	<span class="hljs-attribute">onAdd</span>: <span class="hljs-function"><span class="hljs-params">(map)</span> -&gt;</span>
+		<span class="hljs-property">@_initLayout</span>()
+		<span class="hljs-property">@_update</span>()
+		map
+			.<span class="hljs-literal">on</span> <span class="hljs-string">'layeradd'</span>, <span class="hljs-property">@_onLayerChange</span>, @
+			.<span class="hljs-literal">on</span> <span class="hljs-string">'layerremove'</span>, <span class="hljs-property">@_onLayerChange</span>, @
+		<span class="hljs-property">@_container</span>
+
+	<span class="hljs-attribute">onRemove</span>: <span class="hljs-function"><span class="hljs-params">(map)</span> -&gt;</span>
+		map
+			.<span class="hljs-literal">off</span> <span class="hljs-string">'layeradd'</span>, <span class="hljs-property">@_onLayerChange</span>, @
+			.<span class="hljs-literal">off</span> <span class="hljs-string">'layerremove'</span>, <span class="hljs-property">@_onLayerChange</span>, @
+
+	<span class="hljs-attribute">addLayer</span>: <span class="hljs-function"><span class="hljs-params">(layer, name)</span> -&gt;</span>
+		<span class="hljs-property">@_addLayer</span> layer, name
+		<span class="hljs-property">@_update</span>()
+		@
+
+	<span class="hljs-attribute">removeLayer</span>: <span class="hljs-function"><span class="hljs-params">(layer)</span> -&gt;</span>
+		id = L.stamp layer
+		<span class="hljs-keyword">delete</span> <span class="hljs-property">@_layers</span>[id]
+		<span class="hljs-property">@_update</span>()
+		@
+
+	<span class="hljs-attribute">_addLayer</span>: <span class="hljs-function"><span class="hljs-params">(layer, name)</span> -&gt;</span>
+		id = L.stamp layer
+		<span class="hljs-property">@_layers</span>[id] =
+			<span class="hljs-attribute">layer</span>: layer
+			<span class="hljs-attribute">name</span>: name
+
+		<span class="hljs-keyword">if</span> <span class="hljs-property">@options</span>.autoZIndex <span class="hljs-keyword">and</span> layer.setZIndex
+			<span class="hljs-property">@_lastZIndex</span>++
+			layer.setZIndex <span class="hljs-property">@_lastZIndex</span>
+
+	<span class="hljs-attribute">_onLayerChange</span>: <span class="hljs-function"><span class="hljs-params">(e)</span> -&gt;</span>
+		obj = <span class="hljs-property">@_layers</span>[L.stamp(e.layer)]
+		<span class="hljs-keyword">return</span> <span class="hljs-keyword">unless</span> obj
+		<span class="hljs-property">@_update</span>()  <span class="hljs-keyword">unless</span> <span class="hljs-property">@_handlingClick</span>
+		type = (<span class="hljs-keyword">if</span> e.type <span class="hljs-keyword">is</span> <span class="hljs-string">'layeradd'</span> <span class="hljs-keyword">then</span> <span class="hljs-string">'overlayadd'</span> <span class="hljs-keyword">else</span> <span class="hljs-string">'overlayremove'</span>)
+		<span class="hljs-property">@_map</span>.fire type, obj <span class="hljs-keyword">if</span> type
+		<span class="hljs-keyword">if</span> obj.layer <span class="hljs-keyword">instanceof</span> L.WXTileLayer
+			<span class="hljs-property">@_map</span>.fire <span class="hljs-string">'wxfieldchange'</span>, obj.layer.getField()
+		<span class="hljs-keyword">else</span>
+			<span class="hljs-property">@_map</span>.fire <span class="hljs-string">'wxfieldremove'</span>
+
+	<span class="hljs-attribute">filter</span>: <span class="hljs-function"><span class="hljs-params">(string)</span> -&gt;</span>
+		string = string.trim()
+		layerLabels = <span class="hljs-property">@_container</span>.querySelectorAll <span class="hljs-string">'label'</span>
+		i = <span class="hljs-number">0</span>
+
+		<span class="hljs-keyword">while</span> i &lt; layerLabels.length
+			layerLabel = layerLabels[i]
+			<span class="hljs-keyword">if</span> string <span class="hljs-keyword">isnt</span> <span class="hljs-string">''</span> <span class="hljs-keyword">and</span> layerLabel._layerName.indexOf(string) <span class="hljs-keyword">is</span> -<span class="hljs-number">1</span>
+				L.DomUtil.addClass layerLabel, <span class="hljs-string">'leaflet-minimap-hidden'</span>
+			<span class="hljs-keyword">else</span>
+				L.DomUtil.removeClass layerLabel, <span class="hljs-string">'leaflet-minimap-hidden'</span>
+			i++
+		<span class="hljs-property">@_onListScroll</span>()
+
+	<span class="hljs-attribute">isCollapsed</span>: <span class="hljs-function">-&gt;</span>
+		<span class="hljs-keyword">not</span> L.DomUtil.hasClass <span class="hljs-property">@_container</span>, <span class="hljs-string">'leaflet-control-layers-expanded'</span>
+
+	<span class="hljs-attribute">_expand</span>: <span class="hljs-function"><span class="hljs-params">(e)</span> -&gt;</span>
+		<span class="hljs-keyword">if</span> e? <span class="hljs-keyword">and</span> e.preventDefault?
+			e.preventDefault()
+		L.DomUtil.addClass <span class="hljs-property">@_container</span>, <span class="hljs-string">'leaflet-control-layers-expanded'</span>
+		<span class="hljs-property">@_onListScroll</span>()
+
+	<span class="hljs-attribute">_collapse</span>: <span class="hljs-function">-&gt;</span>
+		<span class="hljs-property">@_container</span>.className = <span class="hljs-property">@_container</span>.className.replace <span class="hljs-string">' leaflet-control-layers-expanded'</span>, <span class="hljs-string">''</span>
+
+	<span class="hljs-attribute">_initLayout</span>: <span class="hljs-function">-&gt;</span>
+		className = <span class="hljs-string">'leaflet-control-layers'</span>
+		container = <span class="hljs-property">@_container</span> = L.DomUtil.create <span class="hljs-string">'div'</span>, className</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>Makes this work on IE10 Touch devices by stopping it from firing a mouseout event when the touch is released</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		container.setAttribute <span class="hljs-string">'aria-haspopup'</span>, <span class="hljs-literal">yes</span>
+		<span class="hljs-keyword">unless</span> L.Browser.touch
+			L.DomEvent.disableClickPropagation(container).disableScrollPropagation container
+		<span class="hljs-keyword">else</span>
+			L.DomEvent.<span class="hljs-literal">on</span> container, <span class="hljs-string">'click'</span>, L.DomEvent.stopPropagation
+		form = <span class="hljs-property">@_form</span> = L.DomUtil.create(<span class="hljs-string">'form'</span>, className + <span class="hljs-string">'-list'</span>)
+		<span class="hljs-keyword">if</span> <span class="hljs-property">@options</span>.collapsed</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>L.DomEvent
+.on(container, ‘mouseover’, @_expand, @)
+.on container, ‘mouseout’, @_collapse, @  unless L.Browser.android</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>			link = <span class="hljs-property">@_layersLink</span> = L.DomUtil.create(<span class="hljs-string">'a'</span>, className + <span class="hljs-string">'-toggle'</span>, container)
+			link.href = <span class="hljs-string">'#'</span>
+			link.title = <span class="hljs-string">'Layers'</span>
+			<span class="hljs-keyword">if</span> L.Browser.touch
+				L.DomEvent
+					.<span class="hljs-literal">on</span>(link, <span class="hljs-string">'click'</span>, L.DomEvent.stop)
+					.<span class="hljs-literal">on</span> link, <span class="hljs-string">'click'</span>, <span class="hljs-property">@_expand</span>, @
+			<span class="hljs-keyword">else</span>
+				L.DomEvent.<span class="hljs-literal">on</span> link, <span class="hljs-string">'click'</span>, <span class="hljs-property">@_expand</span>, @</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>Work around for Firefox android issue <a href="https://github.com/Leaflet/Leaflet/issues/2033">https://github.com/Leaflet/Leaflet/issues/2033</a></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>			L.DomEvent.<span class="hljs-literal">on</span> form, <span class="hljs-string">'click'</span>, (<span class="hljs-function">-&gt;</span>
+				setTimeout L.bind(<span class="hljs-property">@_onInputClick</span>, @), <span class="hljs-number">0</span>
+				<span class="hljs-keyword">return</span>
+			), @
+			<span class="hljs-property">@_map</span>.<span class="hljs-literal">on</span> <span class="hljs-string">'click'</span>, <span class="hljs-property">@_collapse</span>, @</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>TODO keyboard accessibility</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		<span class="hljs-keyword">else</span>
+			<span class="hljs-property">@_expand</span>()
+			
+		<span class="hljs-property">@_layerList</span> = L.DomUtil.create(<span class="hljs-string">'div'</span>, className + <span class="hljs-string">'-layers'</span>, form)
+		container.appendChild form
+		L.DomUtil.addClass <span class="hljs-property">@_container</span>, <span class="hljs-string">'leaflet-control-layers-minimap'</span>
+		L.DomEvent.<span class="hljs-literal">on</span> <span class="hljs-property">@_container</span>, <span class="hljs-string">'scroll'</span>, <span class="hljs-property">@_onListScroll</span>, @
+
+	<span class="hljs-attribute">_update</span>: <span class="hljs-function">-&gt;</span>
+		<span class="hljs-keyword">if</span> <span class="hljs-property">@_container</span>
+			<span class="hljs-property">@_layerList</span>.innerHTML = <span class="hljs-string">""</span>
+			<span class="hljs-property">@_addItem</span> layer <span class="hljs-keyword">for</span> _, layer <span class="hljs-keyword">of</span> <span class="hljs-property">@_layers</span>
+		
+		<span class="hljs-property">@_map</span>.<span class="hljs-literal">on</span> <span class="hljs-string">'resize'</span>, <span class="hljs-property">@_onResize</span>, @
+		<span class="hljs-property">@_onResize</span>()
+		<span class="hljs-property">@_map</span>.whenReady <span class="hljs-property">@_onListScroll</span>, @</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>IE7 bugs out if you create a radio dynamically, so you have to do it this hacky way (see <a href="http://bit.ly/PqYLBe">http://bit.ly/PqYLBe</a>)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-attribute">_createRadioElement</span>: <span class="hljs-function"><span class="hljs-params">(name, checked)</span> -&gt;</span>
+		radioHtml = <span class="hljs-string">"&lt;input type=\"radio\" class=\"leaflet-control-layers-selector\" name=\""</span> + name + <span class="hljs-string">"\""</span>
+		radioHtml += <span class="hljs-string">" checked=\"checked\""</span> <span class="hljs-keyword">if</span> checked
+		radioHtml += <span class="hljs-string">"/&gt;"</span>
+		radioFragment = <span class="hljs-built_in">document</span>.createElement <span class="hljs-string">'div'</span>
+		radioFragment.innerHTML = radioHtml
+		radioFragment.firstChild
+
+	<span class="hljs-attribute">_addItem</span>: <span class="hljs-function"><span class="hljs-params">(obj)</span> -&gt;</span>
+		container = <span class="hljs-property">@_layerList</span>
+		label = L.DomUtil.create <span class="hljs-string">'label'</span>, <span class="hljs-string">'leaflet-minimap-container'</span>, container
+		label._layerName = obj.name
+		checked = <span class="hljs-property">@_map</span>.hasLayer obj.layer
+		<span class="hljs-property">@_createMinimap</span> L.DomUtil.create(<span class="hljs-string">'div'</span>, <span class="hljs-string">'leaflet-minimap'</span>, label), obj.layer
+		span = L.DomUtil.create <span class="hljs-string">'span'</span>, <span class="hljs-string">'leaflet-minimap-label'</span>, label
+		input = <span class="hljs-property">@_createRadioElement</span> <span class="hljs-string">'leaflet-control-layers-selector'</span>, checked
+		input.layerId = L.stamp obj.layer
+		span.appendChild input
+		L.DomEvent.<span class="hljs-literal">on</span> label, <span class="hljs-string">'click'</span>, <span class="hljs-property">@_onInputClick</span>, @
+		name = L.DomUtil.create <span class="hljs-string">'span'</span>, <span class="hljs-string">''</span>, span
+		name.innerHTML = <span class="hljs-string">' '</span> + obj.name
+
+	<span class="hljs-attribute">_onResize</span>: <span class="hljs-function">-&gt;</span>
+		mapHeight = <span class="hljs-property">@_map</span>.getContainer().clientHeight
+		controlHeight = <span class="hljs-property">@_container</span>.clientHeight
+		<span class="hljs-property">@_container</span>.style.overflowY = <span class="hljs-string">'scroll'</span> <span class="hljs-keyword">if</span> controlHeight &gt; mapHeight - <span class="hljs-property">@options</span>.bottomPadding
+		<span class="hljs-property">@_container</span>.style.maxHeight = (mapHeight - <span class="hljs-property">@options</span>.bottomPadding - <span class="hljs-property">@options</span>.topPadding) + <span class="hljs-string">'px'</span>
+
+	<span class="hljs-attribute">_onListScroll</span>: <span class="hljs-function">-&gt;</span>
+		minimaps = <span class="hljs-built_in">document</span>.querySelectorAll <span class="hljs-string">"label[class='leaflet-minimap-container']"</span>
+		<span class="hljs-keyword">return</span>  <span class="hljs-keyword">if</span> minimaps.length <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
+		first = <span class="hljs-literal">undefined</span>
+		last = <span class="hljs-literal">undefined</span>
+		<span class="hljs-keyword">if</span> <span class="hljs-property">@isCollapsed</span>()
+			first = last = -<span class="hljs-number">1</span>
+		<span class="hljs-keyword">else</span>
+			minimapHeight = minimaps.item(<span class="hljs-number">0</span>).clientHeight
+			container = <span class="hljs-property">@_container</span>
+			listHeight = container.clientHeight
+			scrollTop = container.scrollTop
+			first = Math.floor scrollTop / minimapHeight
+			last = Math.ceil((scrollTop + listHeight) / minimapHeight)
+		i = <span class="hljs-number">0</span>
+
+		<span class="hljs-keyword">while</span> i &lt; minimaps.length
+			minimap = minimaps[i].childNodes.item <span class="hljs-number">0</span>
+			map = minimap._miniMap
+			layer = map._layer
+			<span class="hljs-keyword">continue</span> <span class="hljs-keyword">unless</span> layer
+			<span class="hljs-keyword">if</span> i &gt;= first <span class="hljs-keyword">and</span> i &lt;= last
+				layer.addTo map <span class="hljs-keyword">unless</span> map.hasLayer layer
+				map.invalidateSize()
+			<span class="hljs-keyword">else</span>
+				map.removeLayer layer <span class="hljs-keyword">if</span> map.hasLayer layer
+			++i
+
+	<span class="hljs-attribute">_onInputClick</span>: <span class="hljs-function">-&gt;</span>
+		i = <span class="hljs-literal">undefined</span>
+		input = <span class="hljs-literal">undefined</span>
+		obj = <span class="hljs-literal">undefined</span>
+		inputs = <span class="hljs-property">@_form</span>.getElementsByTagName <span class="hljs-string">'input'</span>
+		inputsLen = inputs.length
+		<span class="hljs-property">@_handlingClick</span> = <span class="hljs-literal">yes</span>
+		i = <span class="hljs-number">0</span>
+		<span class="hljs-keyword">while</span> i &lt; inputsLen
+			input = inputs[i]
+			obj = <span class="hljs-property">@_layers</span>[input.layerId]
+			<span class="hljs-keyword">if</span> input.checked <span class="hljs-keyword">and</span> <span class="hljs-keyword">not</span> <span class="hljs-property">@_map</span>.hasLayer(obj.layer)
+				<span class="hljs-property">@_map</span>.addLayer obj.layer
+			<span class="hljs-keyword">else</span> <span class="hljs-property">@_map</span>.removeLayer obj.layer <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> input.checked <span class="hljs-keyword">and</span> <span class="hljs-property">@_map</span>.hasLayer(obj.layer)
+			i++
+		<span class="hljs-property">@_handlingClick</span> = <span class="hljs-literal">no</span>
+		<span class="hljs-property">@_refocusOnMap</span>()
+
+	<span class="hljs-attribute">_createMinimap</span>: <span class="hljs-function"><span class="hljs-params">(mapContainer, originalLayer)</span> -&gt;</span>
+		minimap = mapContainer._miniMap = L.map mapContainer,
+			<span class="hljs-attribute">attributionControl</span>: <span class="hljs-literal">no</span>
+			<span class="hljs-attribute">zoomControl</span>: <span class="hljs-literal">no</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p>disable interaction.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>			<span class="hljs-attribute">dragging</span>: <span class="hljs-literal">no</span>
+			<span class="hljs-attribute">touchZoom</span>: <span class="hljs-literal">no</span>
+			<span class="hljs-attribute">doubleClickZoom</span>: <span class="hljs-literal">no</span>
+			<span class="hljs-attribute">scrollWheelZoom</span>: <span class="hljs-literal">no</span>
+			<span class="hljs-attribute">boxZoom</span>: <span class="hljs-literal">no</span>
+			<span class="hljs-attribute">keyboard</span>: <span class="hljs-literal">no</span>
+			<span class="hljs-attribute">tap</span>: <span class="hljs-literal">no</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>create tilelayer, but do not add it to the map yet.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		minimap._layer = L.layerGroup [
+			_cloneLayer <span class="hljs-property">@options</span>.backgroundLayer
+			_cloneLayer originalLayer
+		]
+		
+		map = <span class="hljs-property">@_map</span>
+		map.whenReady -&gt;
+			minimap.setView map.getCenter(), map.getZoom()
+			map.sync minimap
+
+L.control.layers.wxTilesMinimap = <span class="hljs-function"><span class="hljs-params">(layers, options)</span> -&gt;</span>
+	<span class="hljs-keyword">new</span> L.Control.Layers.WXTilesMinimap(layers, options)</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

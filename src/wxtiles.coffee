@@ -25,20 +25,6 @@ Date::wxformat = (f) ->
 	return '' unless @valueOf()
 	f.replace wxformat.keys, (match) => wxformat.formats[match].call @
 
-#callback=init1409532201851&domain=metoceanview.com
-initservers = [
-	'http://wx.wxtiles.com/'
-	'http://tiles.metoceanview.com/wx/'
-]
-
-tileservers = [
-	'http://sat.metoceanview.com/tile/'
-	'http://tiles.metoceanview.com/wx/'
-	'http://tiles.metoceanview.com/sv/'
-	'http://tiles.metoceanview.com/clim/'
-	'http://tiles.metoceanview.com/hc/'
-]
-
 class wxtiles
 	loadConfiguration: (url, domain, cb) =>
 		host = url.replace /{s}/, 'a'

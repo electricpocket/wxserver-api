@@ -2,7 +2,7 @@
 # Loading wxtiles manually.
 
 # There are several different wxservers, here we are selecting the open one.
-serverurl = 'http://tiles.metoceanview.com/wx/'
+serverurl = 'http://wx.wxtiles.com/'
 domain = 'example.com'
 
 # We use wxtiles to load a configuration from the wxserver.
