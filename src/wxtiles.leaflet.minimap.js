@@ -120,7 +120,7 @@ L.Control.Layers.WXTilesMinimap = L.Control.extend({
     
     if (obj.layer instanceof L.WXTileLayer && e.type != 'layerremove') {
       this._map.fire('wxfieldchange', obj.layer.getField());
-    } else if (obj.layer !instanceof L.WXTileLayer || e.type != 'layerremove') {
+    } else if ( e.type == 'layerremove') {
       this._map.fire('wxfieldremove');
     }
     
