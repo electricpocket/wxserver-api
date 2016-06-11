@@ -119,9 +119,9 @@ L.Control.Layers.WXTilesMinimap = L.Control.extend({
     }
     
     if (obj.layer instanceof L.WXTileLayer) {
-      return this._map.fire('wxfieldchange', obj.layer.getField());
+      this._map.fire('wxfieldchange', obj.layer.getField());
     } else {
-      return this._map.fire('wxfieldremove');
+      this._map.fire('wxfieldremove');
     }
     
     type = (e.type === 'layeradd' ? 'overlayadd' : 'overlayremove');
