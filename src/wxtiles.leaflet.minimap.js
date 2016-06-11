@@ -117,14 +117,16 @@ L.Control.Layers.WXTilesMinimap = L.Control.extend({
     if (!this._handlingClick) {
       this._update();
     }
+    
+    if (obj.layer instanceof L.WXTileLayer) {
+      this._map.fire('wxfieldchange', obj.layer.getField());
+    } else {
+      this._map.fire('wxfieldremove');
+    }
+    
     type = (e.type === 'layeradd' ? 'overlayadd' : 'overlayremove');
     if (type) {
       this._map.fire(type, obj);
-    }
-    if (obj.layer instanceof L.WXTileLayer) {
-      return this._map.fire('wxfieldchange', obj.layer.getField());
-    } else {
-      return this._map.fire('wxfieldremove');
     }
   },
   filter: function(string) {
